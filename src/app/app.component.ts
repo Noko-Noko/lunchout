@@ -23,7 +23,7 @@ export class AppComponent implements OnDestroy {
         userArray.map(user => {
           // Make the drinks array to lower case to compare data
           user.drinks = user.drinks.map(drink => drink.toLowerCase());
-          user["isActive"] = false;
+          user['isActive'] = false;
         });
         return userArray;
       }))
@@ -35,13 +35,13 @@ export class AppComponent implements OnDestroy {
         venueArray.map(venue => {
           // Make the drinks array to lower case to compare data
           venue.drinks = venue.drinks.map(drink => drink.toLowerCase());
-          venue["isActive"] = true;
-          venue["foodReason"] = '';
-          venue["drinkReason"] = '';
+          venue['isActive'] = true;
+          venue['foodReason'] = '';
+          venue['drinkReason'] = '';
         });
         return venueArray;
       }))
-      .subscribe(response => this.filteredVenues = response);;
+      .subscribe(response => this.filteredVenues = response);
 
 
   constructor(private fetchService: FetchService) {}
@@ -59,7 +59,8 @@ export class AppComponent implements OnDestroy {
     let foodsToAvoid = [];
     let mustHaveDrinks = [];
 
-    // Loop throught the users and create a Array of food to avoid and drinks to have.
+    // Loop throught the users and create a Array of food to avoid and drinks
+    // to have.
     this.users.map(user => {
       if (user.isActive) {
         foodsToAvoid.push(...user.wont_eat);
@@ -72,49 +73,52 @@ export class AppComponent implements OnDestroy {
     // Remove duplicates from the arrays
     foodsToAvoid = [...new Set(foodsToAvoid)];
     mustHaveDrinks = [...new Set(mustHaveDrinks)];
-    
+
+    // Loop though the venues and the users and map the rejection reasons for
+    // every discarded venue.
     this.filteredVenues.map(venue => {
       const userWontEat = [];
       const userNothingToDrink = [];
       venue.foodReason = '';
       venue.drinkReason = '';
 
-        this.users.map(user => {
-          if (!user.isActive) return;
-          
-          const avoidFood = user.wont_eat.some(
-              food => venue.food.includes(food));
-          const hasDrink = user.drinks.some(
-              value => venue.drinks.includes(value));
-
-          if (avoidFood) {
-            userWontEat.push(user.name);
-          }
-
-          if (!hasDrink) {
-            userNothingToDrink.push(user.name);
-          }
-        });
-
-        if (userWontEat.length) {
-          const userWontEatString = userWontEat.join(', ');
-          venue.foodReason = `nothing for ${userWontEatString} to eat`;
+      this.users.map(user => {
+        if (!user.isActive) {
+          return;
         }
 
-        if (userNothingToDrink.length) {
-          const userNothingToDrinkString = userNothingToDrink.join(', ');
-          venue.drinkReason = 
-              `nothing for ${userNothingToDrinkString} to drink`;
+        const avoidFood = user.wont_eat.some(
+            food => venue.food.includes(food));
+        const hasDrink = user.drinks.some(
+            value => venue.drinks.includes(value));
+
+        if (avoidFood) {
+          userWontEat.push(user.name);
         }
 
-        venue.isActive = (userWontEat.length || userNothingToDrink.length)
-            ? false : true;
+        if (!hasDrink) {
+          userNothingToDrink.push(user.name);
+        }
       });
+
+      if (userWontEat.length) {
+        const userWontEatString = userWontEat.join(', ');
+        venue.foodReason = `nothing for ${userWontEatString} to eat`;
+      }
+
+      if (userNothingToDrink.length) {
+        const userNothingToDrinkString = userNothingToDrink.join(', ');
+        venue.drinkReason =
+            `nothing for ${userNothingToDrinkString} to drink`;
+      }
+
+      venue.isActive = (userWontEat.length || userNothingToDrink.length)
+          ? false : true;
+    });
   }
 
   ngOnDestroy() {
     this.originalUsers.unsubscribe();
     this.venues.unsubscribe();
   }
-
 }
