@@ -1,0 +1,57 @@
+.main {
+  display: flex;
+  justify-content: center;
+  font: 16px Verdana;
+}
+
+.container {
+  margin-bottom: 40px;
+}
+
+h1 {
+  font: 64px 'Londrina Outline';
+}
+
+h2 {
+  background-color: red;
+  padding: 8px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+
+  li {
+    margin-bottom: 8px;
+    opacity: .5;
+
+    &.active {
+      opacity: 1;
+    }
+
+    span {
+      display: block;
+      font-size: 14px;;
+      font-style: italic;
+      margin-top: 4px;
+
+      &::before {
+        content: '- ';
+      }
+    }
+  }
+
+  &.users li {
+    cursor: pointer;
+    text-decoration: line-through;
+
+    &:hover {
+      color: red;
+    }
+
+    &.active {
+      opacity: 1;
+      text-decoration: none;
+    }
+  }
+}
